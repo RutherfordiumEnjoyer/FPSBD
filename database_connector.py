@@ -1,25 +1,32 @@
-import mysql.connector
+import pymysql.cursors
 from pymongo import MongoClient
 import os
 
 def connect_to_mysql():
+    """
+    Fungsi koneksi ke MySQL menggunakan PyMySQL,
+    yang lebih kompatibel dengan lingkungan serverless.
+    """
     try:
-        conn = mysql.connector.connect(
+
+        conn = pymysql.connect(
             host=os.environ.get("DB_HOST"),
             user=os.environ.get("DB_USER"),
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME"),
-            ssl_verify_cert=True,
-            ssl_ca=os.environ.get("MYSQL_ATTR_SSL_CA")
+
+            cursorclass=pymysql.cursors.DictCursor,
+
+            ssl={'ca': os.environ.get("MYSQL_ATTR_SSL_CA")}
         )
         return conn
-    except mysql.connector.Error as e:
-        # Mencetak error ke log Vercel untuk debugging
-        print(f"Error saat menghubungkan ke MySQL: {e}")
+    except pymysql.MySQLError as e:
+
+        print(f"Error saat menghubungkan ke MySQL dengan PyMySQL: {e}")
         return None
 
 def connect_to_mongodb():
-    """Fungsi untuk membuat dan mengembalikan koneksi ke database MongoDB."""
+    """Fungsi koneksi ke MongoDB (tidak ada perubahan di sini)."""
     try:
         mongo_uri = os.environ.get("MONGO_URI")
         client = MongoClient(mongo_uri)
