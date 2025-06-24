@@ -10,8 +10,7 @@ def connect_to_mysql():
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME"),
 
-
-            ssl_ca="/etc/ssl/cert.pem"
+            ssl_disabled=False
         )
         return conn
     except mysql.connector.Error as e:
