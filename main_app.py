@@ -2,6 +2,7 @@ from collections import Counter
 from database_connector import connect_to_mysql, connect_to_mongodb
 from datetime import date, timedelta, datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import pymysql
 
 def tambah_buku(title, author, publication_year, stock, category_id):
     conn = connect_to_mysql()
