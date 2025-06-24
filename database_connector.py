@@ -1,30 +1,33 @@
+# database_connector.py (Versi Debugging dengan Hardcode)
+
 import pymysql.cursors
 from pymongo import MongoClient
 import os
 
 def connect_to_mysql():
     """
-    Fungsi koneksi ke MySQL menggunakan PyMySQL.
+    Fungsi koneksi ke MySQL untuk tes debugging.
+    Kredensial ditulis langsung untuk memastikan tidak ada masalah Environment Variable.
     """
     try:
-        # Mengambil port dari environment variable, atau gunakan 3306 sebagai default
-        db_port = int(os.environ.get("DB_PORT", 3306))
-
+        # --- UBAH BAGIAN INI DENGAN DETAIL DARI RAILWAY ANDA ---
         conn = pymysql.connect(
-            host=os.environ.get("DB_HOST"),
-            user=os.environ.get("DB_USER"),
-            password=os.environ.get("DB_PASSWORD"),
-            database=os.environ.get("DB_NAME"),
-            port=db_port,
-            cursorclass=pymysql.cursors.DictCursor
+            host="yamanote.proxy.rlwy.net",
+            user="root",
+            password="BThcMOXoyxnuZWGbjtfBSVSXFRESgphg",
+            database="railway",
+            port=38093,
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=30
         )
         return conn
     except pymysql.MySQLError as e:
-        print(f"Error saat menghubungkan ke MySQL dengan PyMySQL: {e}")
+        # Kita buat pesan errornya lebih spesifik untuk tes ini
+        print(f"Error dengan kredensial hardcoded: {e}")
         return None
 
 def connect_to_mongodb():
-    """Fungsi koneksi ke MongoDB (tidak ada perubahan)."""
+    # ... (fungsi ini tidak perlu diubah)
     try:
         mongo_uri = os.environ.get("MONGO_URI")
         client = MongoClient(mongo_uri)
