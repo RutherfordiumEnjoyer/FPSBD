@@ -588,9 +588,14 @@ def user_login(email, password):
             conn.close()
 
 def register_user(full_name, email, password):
-    conn = None # Definisikan conn di luar try
+    conn = None  # Definisikan di luar try agar bisa diakses di finally
     try:
         conn = connect_to_mysql()
+        # Jika koneksi gagal, conn akan menjadi None. Kita harus cek di sini.
+        if conn is None:
+            # Mengembalikan pesan error yang jelas jika koneksi gagal dari awal
+            return "Koneksi database gagal. Periksa kembali Environment Variables atau status database cloud."
+
         cursor = conn.cursor()
         
         hashed_password = generate_password_hash(password)
@@ -601,17 +606,24 @@ def register_user(full_name, email, password):
         cursor.execute(query, values)
         conn.commit()
         return True
+    
     except pymysql.MySQLError as e:
-        # TANGKAP ERROR SPESIFIK & JADIKAN PESAN FLASH
+        # Menangkap error spesifik dari database (misal: duplicate email)
         error_message = f"Database Error: {e}"
         print(error_message) # Cetak ke log Vercel
-        return error_message # Kembalikan pesan error asli untuk ditampilkan
+        
+        # Memberi pesan yang lebih ramah ke pengguna
+        if "1062" in str(e):
+             return "Email ini sudah terdaftar. Silakan gunakan email lain."
+        return "Terjadi kesalahan pada database."
+
     except Exception as e:
-        # Menangkap error lainnya
+        # Menangkap error tak terduga lainnya
         return f"An unexpected error occurred: {e}"
+        
     finally:
+        # Memastikan koneksi selalu ditutup
         if conn and conn.is_connected():
-            cursor.close()
             conn.close()
 
 def lihat_semua_review(limit=20):
