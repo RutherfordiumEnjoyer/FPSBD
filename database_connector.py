@@ -1,15 +1,17 @@
 import mysql.connector
 from pymongo import MongoClient
-import os # <-- Tambahkan import ini
+import os
 
 def connect_to_mysql():
     try:
         conn = mysql.connector.connect(
-            # Ambil detail koneksi dari Environment Variables
             host=os.environ.get("DB_HOST"),
             user=os.environ.get("DB_USER"),
             password=os.environ.get("DB_PASSWORD"),
-            database=os.environ.get("DB_NAME")
+            database=os.environ.get("DB_NAME"),
+
+
+            ssl_ca="/etc/ssl/cert.pem"
         )
         return conn
     except mysql.connector.Error as e:
@@ -20,10 +22,11 @@ def connect_to_mysql():
 def connect_to_mongodb():
     """Fungsi untuk membuat dan mengembalikan koneksi ke database MongoDB."""
     try:
-        # Ambil connection string dari Environment Variable
         mongo_uri = os.environ.get("MONGO_URI")
         client = MongoClient(mongo_uri)
-        db = client['library_nosql_db'] # Anda bisa tetap menggunakan nama db ini
+        # Mengambil nama database dari URI jika ada, atau gunakan default
+        db_name = os.environ.get("MONGO_DB_NAME", "library_nosql_db")
+        db = client[db_name]
         return db
     except Exception as e:
         print(f"Error saat menghubungkan ke MongoDB: {e}")
