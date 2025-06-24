@@ -587,14 +587,11 @@ def user_login(email, password):
             conn.close()
 
 def register_user(full_name, email, password):
-    conn = connect_to_mysql()
-    if conn is None:
-        return "Koneksi database gagal."
-    
+    conn = None # Definisikan conn di luar try
     try:
+        conn = connect_to_mysql()
         cursor = conn.cursor()
         
-        # Hash password sebelum disimpan
         hashed_password = generate_password_hash(password)
         
         query = "INSERT INTO users (full_name, email, password_hash) VALUES (%s, %s, %s)"
@@ -603,14 +600,16 @@ def register_user(full_name, email, password):
         cursor.execute(query, values)
         conn.commit()
         return True
+    except pymysql.MySQLError as e:
+        # TANGKAP ERROR SPESIFIK & JADIKAN PESAN FLASH
+        error_message = f"Database Error: {e}"
+        print(error_message) # Cetak ke log Vercel
+        return error_message # Kembalikan pesan error asli untuk ditampilkan
     except Exception as e:
-        # Cek jika error karena email sudah ada (kode error 1062 untuk duplicate entry)
-        if "1062" in str(e):
-            return "Email ini sudah terdaftar. Silakan gunakan email lain."
-        else:
-            return f"Gagal mendaftar: {e}"
+        # Menangkap error lainnya
+        return f"An unexpected error occurred: {e}"
     finally:
-        if conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
 
