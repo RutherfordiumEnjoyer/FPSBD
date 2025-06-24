@@ -1,4 +1,4 @@
-# database_connector.py (Versi Debugging dengan Hardcode)
+# database_connector.py (VERSI FINAL)
 
 import pymysql.cursors
 from pymongo import MongoClient
@@ -6,32 +6,36 @@ import os
 
 def connect_to_mysql():
     """
-    Fungsi koneksi ke MySQL untuk tes debugging.
-    Kredensial ditulis langsung untuk memastikan tidak ada masalah Environment Variable.
+    Fungsi koneksi ke MySQL menggunakan PyMySQL dengan semua konfigurasi
+    yang diperlukan untuk koneksi cloud yang stabil.
     """
     try:
-        # --- UBAH BAGIAN INI DENGAN DETAIL DARI RAILWAY ANDA ---
+        # Mengambil port dan mengubahnya menjadi integer
+        db_port = int(os.environ.get("DB_PORT"))
+
         conn = pymysql.connect(
-            host="yamanote.proxy.rlwy.net",
-            user="root",
-            password="BThcMOXoyxnuZWGbjtfBSVSXFRESgphg",
-            database="railway",
-            port=38093,
+            host=os.environ.get("DB_HOST"),
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASSWORD"),
+            database=os.environ.get("DB_NAME"),
+            port=db_port,
             cursorclass=pymysql.cursors.DictCursor,
-            connect_timeout=30
+            connect_timeout=30 # Waktu tunggu koneksi
         )
         return conn
-    except pymysql.MySQLError as e:
-        # Kita buat pesan errornya lebih spesifik untuk tes ini
-        print(f"Error dengan kredensial hardcoded: {e}")
+    except (pymysql.MySQLError, TypeError, ValueError) as e:
+        # Menangkap error jika koneksi gagal atau jika DB_PORT tidak ada/bukan angka
+        print(f"Error saat menghubungkan ke MySQL: {e}")
         return None
 
 def connect_to_mongodb():
-    # ... (fungsi ini tidak perlu diubah)
+    """Fungsi koneksi ke MongoDB."""
     try:
         mongo_uri = os.environ.get("MONGO_URI")
         client = MongoClient(mongo_uri)
-        db = client['library_nosql_db']
+        # Menggunakan nama database dari URI jika memungkinkan, atau nama default
+        db_name = MongoClient(mongo_uri).get_default_database().name
+        db = client[db_name]
         return db
     except Exception as e:
         print(f"Error saat menghubungkan ke MongoDB: {e}")
