@@ -7,13 +7,16 @@ def connect_to_mysql():
     Fungsi koneksi ke MySQL menggunakan PyMySQL.
     """
     try:
+        # Mengambil port dari environment variable, atau gunakan 3306 sebagai default
+        db_port = int(os.environ.get("DB_PORT", 3306))
+
         conn = pymysql.connect(
             host=os.environ.get("DB_HOST"),
             user=os.environ.get("DB_USER"),
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME"),
-            cursorclass=pymysql.cursors.DictCursor,
-            connect_timeout=30 # <-- TAMBAHKAN INI (waktu tunggu 30 detik)
+            port=db_port,
+            cursorclass=pymysql.cursors.DictCursor
         )
         return conn
     except pymysql.MySQLError as e:
