@@ -1,4 +1,4 @@
 Flask
 Werkzeug
-mysql-connector-python
+PyMySQL
 pymongo
