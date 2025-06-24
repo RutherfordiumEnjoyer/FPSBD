@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% set title = "Edit Kategori" if category else "Tambah Kategori Baru" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2em auto;
+        padding: 2em;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .form-container h1 {
+        text-align: center;
+        margin-top: 0;
+    }
+    label { display: block; margin-bottom: 8px; font-weight: 500; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    .btn-group { margin-top: 1.5em; display: flex; gap: 10px; }
+    .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; text-align: center; }
+    .btn-save { background-color: #007bff; color: white; flex-grow: 1; }
+    .btn-cancel { background-color: #6c757d; color: white; }
+</style>
+
+<div class="form-container">
+    <h1>{{ title }}</h1>
+    <form method="POST">
+        <div>
+            <label for="category_name">Nama Kategori</label>
+            <input type="text" id="category_name" name="category_name" value="{{ category.category_name if category else '' }}" required>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-save">Simpan</button>
+            <a href="{{ url_for('admin_category_list') }}" class="btn btn-cancel">Batal</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

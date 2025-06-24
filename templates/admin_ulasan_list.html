@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block title %}Semua Ulasan Pengguna{% endblock %}
+{% block content %}
+<style>
+    /* Menggunakan kembali style dari semua_review.html */
+    .review-feed-container { max-width: 900px; margin: auto; }
+    .review-card { background-color: white; padding: 1.5em; border-radius: 15px; margin-bottom: 1.5em; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .review-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .review-book-title a { font-weight: bold; font-size: 1.2em; text-decoration: none; color: #0056b3; }
+    .review-book-title a:hover { text-decoration: underline; }
+    .review-rating { font-weight: bold; color: #f39c12; font-size: 1.1em; }
+    .review-body { border-top: 1px solid #eee; padding-top: 10px; }
+    .review-meta { font-size: 0.9em; color: #6c757d; }
+    .review-comment { margin-top: 5px; color: #333; }
+</style>
+
+<div style="text-align: center; color: white; margin-bottom: 2em;">
+    <h1>Semua Ulasan Pengguna</h1>
+    <p>Ulasan-ulasan terbaru dari semua buku di perpustakaan.</p>
+</div>
+
+<div class="review-feed-container">
+    {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-card-header">
+                <span class="review-book-title">
+                    <a href="{{ url_for('book_detail', book_id=review.book_id) }}">{{ review.book_title }}</a>
+                </span>
+                <span class="review-rating">★ {{ review.rating }}/5</span>
+            </div>
+            <div class="review-body">
+                <p class="review-comment">"{{ review.komentar }}"</p>
+                <p class="review-meta">Diulas oleh: <strong>{{ review.username }}</strong> (User ID: {{ review.user_id }}) pada {{ review.tanggal_review }}</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="review-card" style="text-align: center;">Belum ada review sama sekali.</div>
+    
+    {% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dasbor Admin{% endblock %}
+
+{% block content %}
+<style>
+    /* Rekomendasi 1: Mengubah Background Header di layout.html */
+    /* Kode ini akan menimpa style .navbar dari layout.html khusus untuk halaman ini */
+    .navbar {
+        background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    }
+    .nav-username {
+        color: #f0f0f0; /* Menyesuaikan warna teks nama admin */
+    }
+
+    .admin-header {
+        color: white;
+        margin-bottom: 1.5rem;
+    }
+    .admin-header h1 { margin: 0; font-weight: 600; }
+    .admin-header p { opacity: 0.9; font-size: 1.1em; }
+
+    .section-header {
+        color: white;
+        font-weight: 500;
+        font-size: 1.5em;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .section-header:first-of-type {
+        margin-top: 0;
+    }
+
+    /* Rekomendasi 4: Gradasi pada Kartu Statistik */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+    .stat-card {
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+        /* Rekomendasi 2: Efek bayangan ringan */
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+    }
+    .stat-card.gradient-1 { background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); }
+    .stat-card.gradient-2 { background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); }
+    .stat-card.gradient-3 { background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%); color: #333; }
+    .stat-card.gradient-4 { background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%); }
+    
+    .stat-title { font-size: 1em; opacity: 0.9; margin-bottom: 5px; }
+    .stat-value { font-size: 2.8em; font-weight: 700; line-height: 1; }
+    .stat-card i {
+        position: absolute;
+        right: 20px;
+        bottom: 15px;
+        font-size: 3.5em;
+        opacity: 0.15;
+        transform: rotate(-15deg);
+    }
+
+    /* Rekomendasi 5: Garis Pembatas */
+    .section-divider {
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+        margin: 3rem 0;
+    }
+
+    /* Rekomendasi 6: Ikon pada Kartu Menu */
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .menu-card {
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        text-decoration: none;
+        color: #333;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        /* Rekomendasi 2: Efek bayangan ringan */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .menu-card-icon { font-size: 2em; color: #007bff; margin-bottom: 15px; }
+    .menu-card h3 { margin-top: 0; font-size: 1.3em; color: #0056b3; }
+    .menu-card p { font-size: 0.9em; color: #666; flex-grow: 1; }
+    
+    .action-link {
+        font-weight: 600;
+        color: #007bff;
+        text-decoration: none;
+        margin-top: 1em;
+        padding: 8px 0;
+        border-radius: 8px;
+        transition: background-color 0.2s, padding-left 0.2s;
+    }
+    /* Rekomendasi 3: Efek hover pada tombol/link */
+    .action-link:hover {
+        background-color: #f0f8ff;
+        padding-left: 10px;
+    }
+    .action-link:after { content: ' →'; }
+</style>
+
+<div class="admin-header">
+    <h1>Dasbor Administrator</h1>
+    <p>Selamat datang kembali, {{ session.full_name }}!</p>
+</div>
+
+<h2 class="section-header">Ringkasan Sistem</h2>
+<div class="stats-grid">
+    <div class="stat-card gradient-1">
+        <div class="stat-title">Total Judul Buku</div>
+        <div class="stat-value">{{ stats.total_books }}</div>
+        <i class="fa-solid fa-book"></i>
+    </div>
+    <div class="stat-card gradient-2">
+        <div class="stat-title">Pengguna Terdaftar</div>
+        <div class="stat-value">{{ stats.total_users }}</div>
+        <i class="fa-solid fa-users"></i>
+    </div>
+    <div class="stat-card gradient-3">
+        <div class="stat-title">Buku Sedang Dipinjam</div>
+        <div class="stat-value">{{ stats.books_borrowed }}</div>
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </div>
+    <div class="stat-card gradient-4">
+        <div class="stat-title">Jumlah Kategori</div>
+        <div class="stat-value">{{ stats.total_categories }}</div>
+        <i class="fa-solid fa-tags"></i>
+    </div>
+</div>
+
+<hr class="section-divider">
+
+<h2 class="section-header">Menu Utama</h2>
+<div class="menu-grid">
+    <a href="{{ url_for('admin_book_list') }}" class="menu-card">
+        <i class="fa-solid fa-swatchbook menu-card-icon"></i>
+        <h3>Manajemen Buku</h3>
+        <p>Lihat, tambah, edit, dan hapus data buku di perpustakaan.</p>
+        <span class="action-link">Kelola Sekarang</span>
+    </a>
+
+    <a href="{{ url_for('admin_category_list') }}" class="menu-card">
+        <i class="fa-solid fa-sitemap menu-card-icon"></i>
+        <h3>Manajemen Kategori</h3>
+        <p>Kelola kategori buku untuk pengorganisasian koleksi yang lebih baik.</p>
+        <span class="action-link">Lihat Kategori</span>
+    </a>
+    
+    <a href="{{ url_for('admin_reports_hub') }}" class="menu-card">
+        <i class="fa-solid fa-chart-pie menu-card-icon"></i>
+        <h3>Laporan & Tren</h3>
+        <p>Lihat riwayat peminjaman, buku terpopuler, dan data analitik lainnya.</p>
+        <span class="action-link">Buka Laporan</span>
+    </a>
+
+    <a href="{{ url_for('admin_activity_hub') }}" class="menu-card">
+        <i class="fa-solid fa-user-clock menu-card-icon"></i>
+        <h3>Aktivitas Pengguna</h3>
+        <p>Pantau log aktivitas, lihat profil preferensi, dan kelola ulasan dari pengguna.</p>
+        <span class="action-link">Lihat Aktivitas</span>
+    </a>
+</div>
+{% endblock %}

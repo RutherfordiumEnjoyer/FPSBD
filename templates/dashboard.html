@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dasbor Pengguna{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 2em;
+    }
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        margin: auto;
+    }
+    .menu-card {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 25px;
+        text-align: left;
+        text-decoration: none;
+        color: #333;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+
+        background-size: 80px;
+        background-repeat: no-repeat;
+        background-position: bottom 20px right 20px;
+    }
+    .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .menu-card h3 {
+        margin-top: 0;
+        font-size: 1.2em;
+        color: #0056b3;
+        position: relative;
+        z-index: 2;
+    }
+    .menu-card p {
+        font-size: 0.9em;
+        color: #666;
+        max-width: 80%;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* --- PERUBAHAN DIMULAI DI SINI --- */
+    /* Nilai alpha (transparansi) diubah dari 0.85 menjadi 0.75 agar ikon lebih terlihat */
+
+    #card-all-books {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_books.png') }}");
+    }
+    #card-popular {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_trending.png') }}");
+    }
+    #card-history {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_history.png') }}");
+    }
+    #card-wishlist {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_wishlist.png') }}");
+    }
+    #card-recommendation {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_idea.png') }}");
+    }
+    #card-give-review {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_review.png') }}");
+    }
+    #card-profile {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_profile.png') }}");
+    }
+    #card-see-reviews {
+        background-image: linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)), url("{{ url_for('static', filename='images/icon_search.png') }}");
+    }
+    /* --- PERUBAHAN CSS SELESAI DI SINI --- */
+</style>
+
+<div class="dashboard-header">
+    <h1>Menu Layanan Perpustakaan</h1>
+    <p>Pilih layanan yang ingin Anda gunakan di bawah ini.</p>
+</div>
+
+<div class="menu-grid">
+    <a href="{{ url_for('daftar_buku_user') }}" class="menu-card" id="card-all-books">
+        <h3>1. Lihat Semua Buku</h3>
+        <p>Jelajahi seluruh koleksi buku yang tersedia di perpustakaan kami.</p>
+    </a>
+    <a href="{{ url_for('buku_populer') }}" class="menu-card" id="card-popular">
+        <h3>2. Lihat Buku Terpopuler</h3>
+        <p>Temukan buku-buku yang sedang tren dan banyak dipinjam oleh pengguna lain.</p>
+    </a>
+    <a href="{{ url_for('riwayat_peminjaman') }}" class="menu-card" id="card-history">
+        <h3>3. Pinjam & Kembalikan Buku</h3>
+        <p>Lihat riwayat peminjaman Anda dan lakukan pengembalian buku.</p>
+    </a>
+    <a href="{{ url_for('wishlist') }}" class="menu-card" id="card-wishlist">
+        <h3>4. Wishlist Anda</h3>
+        <p>Kelola daftar buku yang ingin Anda baca atau pinjam di masa depan.</p>
+    </a>
+    <a href="{{ url_for('rekomendasi') }}" class="menu-card" id="card-recommendation">
+        <h3>5. Dapatkan Rekomendasi</h3>
+        <p>Biarkan sistem merekomendasikan buku berdasarkan minat Anda.</p>
+    </a>
+    <a href="{{ url_for('daftar_buku_review') }}" class="menu-card" id="card-give-review">
+        <h3>6. Beri Review & Rating</h3>
+        <p>Bagikan pendapat Anda mengenai buku yang telah Anda baca.</p>
+    </a>
+    <a href="{{ url_for('profil') }}" class="menu-card" id="card-profile">
+        <h3>7. Lihat Profil Preferensi</h3>
+        <p>Analisis kebiasaan membaca dan preferensi kategori atau penulis favorit Anda.</p>
+    </a>
+    <a href="{{ url_for('semua_review') }}" class="menu-card" id="card-see-reviews">
+        <h3>8. Lihat Review Buku</h3>
+        <p>Baca ulasan dari pengguna lain sebelum Anda memutuskan untuk meminjam.</p>
+    </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<style>
+    /* Menghilangkan background gradient dari layout utama khusus untuk halaman ini */
+    body {
+        background: #f4f7f6; /* Latar belakang abu-abu netral */
+    }
+    .admin-login-container {
+        display: flex;
+        max-width: 900px;
+        margin: 4em auto;
+        min-height: 550px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .left-panel {
+        flex-basis: 50%;
+        background: linear-gradient(135deg, #2c3e50, #34495e); /* Gradient abu-abu gelap */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        color: white;
+        text-align: center;
+    }
+    .left-panel img {
+        max-width: 150px;
+        margin-bottom: 1em;
+    }
+    .left-panel h2 {
+        margin-top: 0;
+        font-size: 1.8em;
+    }
+    .left-panel p {
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+    .right-panel {
+        flex-basis: 50%;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .right-panel h2 {
+        text-align: center;
+        margin-bottom: 1.5em;
+        color: #333;
+        font-weight: 600;
+    }
+    .form-group {
+        margin-bottom: 1.5em;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #555;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        box-sizing: border-box;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1em;
+    }
+    .btn-login-admin {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        background-color: #2c3e50;
+        color: white;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn-login-admin:hover {
+        background-color: #34495e;
+    }
+</style>
+
+<div class="admin-login-container">
+    <div class="left-panel">
+        <img src="{{ url_for('static', filename='images/atmintlogo.png') }}" alt="Admin Dashboard Icon">
+        <h2>Admin Panel</h2>
+        <p>Gunakan kredensial Anda untuk mengakses dasbor pengelolaan perpustakaan.</p>
+    </div>
+    <div class="right-panel">
+        <h2>Administrator Login</h2>
+        <form action="{{ url_for('admin_login_proses') }}" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-login-admin">Login sebagai Admin</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

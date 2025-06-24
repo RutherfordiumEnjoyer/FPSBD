@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Perpustakaan Digital{% endblock %}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            color: #333;
+        }
+
+        /* STRUKTUR NAVBAR BARU */
+        .navbar {
+            background-color: white;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* --- PERUBAHAN DIMULAI DI SINI --- */
+
+        .nav-left, .nav-center, .nav-right {
+            display: flex;
+            align-items: center;
+            /* Atur agar ketiga bagian ini fleksibel */
+            flex: 1;
+        }
+
+        .nav-center {
+            /* Pastikan item tengah berada di posisi tengah */
+            justify-content: center;
+        }
+
+        .nav-right {
+            /* Pastikan item kanan berada di posisi kanan */
+            justify-content: flex-end;
+            gap: 15px; /* Jarak antar item di kanan */
+        }
+
+        .nav-logo {
+            /* DIUBAH: Naikkan ukuran logo */
+            height: 80px; 
+        }
+
+        .nav-title {
+            /* DIUBAH: Naikkan ukuran tulisan dasbor */
+            height: 80px;
+        }
+        
+        /* --- PERUBAHAN SELESAI DI SINI --- */
+
+        .nav-pfp {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .nav-username {
+            font-weight: 600;
+        }
+        .btn-logout {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-logout:hover {
+            background-color: #d32f2f;
+        }
+        .btn-login {
+            background-color: #1976d2;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        /* Konten Utama */
+        .main-content {
+            padding: 2em 40px;
+        }
+        
+        /* Notifikasi Flash */
+        .alert { padding: 1em; margin-bottom: 1em; border-radius: 5px; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='images/logodashboard.png') }}" alt="Logo" class="nav-logo">
+            </a>
+        </div>
+        
+        <div class="nav-center">
+            {% if session.user_id and session.role == 'user' %}
+                <img src="{{ url_for('static', filename='images/dashboardtulisan.png') }}" alt="Dashboard Title" class="nav-title">
+            {% endif %}
+        </div>
+
+        <div class="nav-right">
+            {% if session.user_id %}
+                <img src="{{ url_for('static', filename='images/dashboardprofil.png') }}" alt="Profile Picture" class="nav-pfp">
+                <span class="nav-username">{{ session.full_name }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

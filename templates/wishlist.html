@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% block title %}Wishlist Saya{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2em; color: white; }
+    .page-header h1 { margin: 0; }
+    
+    /* --- PERUBAHAN CSS DIMULAI DI SINI --- */
+    /* Gaya CSS ini disalin dari halaman lain untuk konsistensi */
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1rem;
+        margin-top: 1.5rem;
+    }
+
+    th {
+        background-color: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: left;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    td {
+        background-color: #ffffff;
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: #333;
+        font-weight: 500;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    tr:hover td {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(4, 33, 52, 0.15);
+    }
+    
+    td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+    
+    td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .btn {
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+    }
+    /* --- PERUBAHAN CSS SELESAI DI SINI --- */
+</style>
+
+<div class="page-header">
+    <h1>Wishlist Buku Anda</h1>
+    <p>Daftar buku yang ingin Anda pinjam atau baca di masa depan.</p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Judul Buku</th>
+            <th>Penulis</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in wishlist_items %}
+        <tr>
+            <td>{{ item.title }}</td>
+            <td>{{ item.author }}</td>
+            <td>
+                <div style="display: flex; gap: 10px;">
+                    <form action="{{ url_for('proses_pinjam_buku', book_id=item.book_id) }}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn" style="background-color: #007bff; color: white; font-size: 0.9em; padding: 8px 15px;">Pinjam</button>
+                    </form>
+                    <form action="{{ url_for('proses_hapus_wishlist', wishlist_id=item.wishlist_id) }}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn delete-button" style="font-size: 0.9em; padding: 8px 15px; background-color: #dc3545; color: white;">Hapus</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Wishlist Anda masih kosong.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

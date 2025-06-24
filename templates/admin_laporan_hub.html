@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block title %}Pusat Laporan & Tren{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { color: white; margin-bottom: 2rem; }
+    .page-header h1 { margin: 0; font-weight: 600; }
+    .page-header p { opacity: 0.9; font-size: 1.1em; }
+    /* Menggunakan kembali style dari admin_dashboard */
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .menu-card { background-color: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 25px; text-decoration: none; color: #333; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .menu-card h3 { margin-top: 0; font-size: 1.3em; color: #0056b3; }
+    .menu-card p { font-size: 0.9em; color: #666; flex-grow: 1; }
+    .menu-card .action-link { font-weight: 600; color: #007bff; text-decoration: none; margin-top: 1em; }
+    .menu-card .action-link:after { content: ' →'; }
+</style>
+
+<div class="page-header">
+    <h1>Pusat Laporan & Tren</h1>
+    <p>Pilih laporan yang ingin Anda lihat dari daftar di bawah ini.</p>
+</div>
+
+<div class="menu-grid">
+    <a href="{{ url_for('admin_borrowal_report') }}" class="menu-card">
+        <h3>Laporan Peminjaman Lengkap</h3>
+        <p>Lihat riwayat lengkap semua aktivitas peminjaman dan pengembalian buku oleh seluruh pengguna.</p>
+        <span class="action-link">Buka Laporan</span>
+    </a>
+
+    <a href="{{ url_for('admin_trends_report') }}" class="menu-card">
+        <h3>Laporan Buku Terpopuler</h3>
+        <p>Analisis tren buku yang paling banyak dipinjam dalam 7 hari terakhir dan perbarui data tren secara manual.</p>
+        <span class="action-link">Lihat Tren</span>
+    </a>
+</div>
+
+{% endblock %}

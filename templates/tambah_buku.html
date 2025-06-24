@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tambah Buku Baru</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        form { max-width: 500px; }
+        label, input, select { display: block; margin-bottom: 10px; width: 100%; }
+        input, select { padding: 8px; }
+        .btn-group { margin-top: 20px; }
+        button, a { padding: 10px 15px; border-radius: 5px; text-decoration: none; border: none; cursor: pointer; }
+        .btn-save { background-color: #28a745; color: white; }
+        .btn-cancel { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Formulir Tambah Buku Baru</h1>
+    <form action="{{ url_for('proses_tambah_buku') }}" method="POST">
+        <label for="title">Judul Buku</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="author">Penulis</label>
+        <input type="text" id="author" name="author" required>
+
+        <label for="publication_year">Tahun Terbit</label>
+        <input type="number" id="publication_year" name="publication_year" required>
+
+        <label for="stock">Jumlah Stok</label>
+        <input type="number" id="stock" name="stock" required>
+
+        <label for="category_id">Kategori</label>
+        <select name="category_id" id="category_id" required>
+            {% for cat in categories %}
+                <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+            {% endfor %}
+        </select>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-save">Simpan Buku</button>
+            <a href="{{ url_for('index') }}" class="btn-cancel">Batal</a>
+        </div>
+    </form>
+</body>
+</html>

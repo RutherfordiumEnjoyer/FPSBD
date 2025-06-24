@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ book.title if book else 'Detail Buku' }}{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2em; color: white; }
+    .page-header h1 { margin: 0; }
+    .container { max-width: 900px; margin: auto; }
+    .book-info, .review-form, .review-list { background-color: white; padding: 2em; border-radius: 15px; margin-bottom: 2em; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .book-info h2 { margin-top: 0; }
+    .review-form textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Poppins', sans-serif; }
+    .review-form select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin: 10px 0; }
+    .review-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+    .review-item:last-child { border-bottom: none; }
+    .review-header { display: flex; justify-content: space-between; align-items: center; }
+    .review-user { font-weight: 600; }
+    .review-rating { font-weight: bold; color: #f39c12; }
+    .review-comment { margin-top: 5px; color: #555; }
+</style>
+
+<div class="container">
+    {% if book %}
+        <div class="book-info">
+            <h2>{{ book.title }}</h2>
+            <p><strong>Penulis:</strong> {{ book.author }}</p>
+            <p><strong>Tahun Terbit:</strong> {{ book.publication_year }}</p>
+        </div>
+
+        <div class="review-form">
+            <h3>Beri Ulasan Anda</h3>
+            <form action="{{ url_for('tambah_review_proses', book_id=book.book_id) }}" method="POST">
+                <label for="rating">Rating:</label>
+                <select name="rating" id="rating" required>
+                    <option value="5">★★★★★ (5 Bintang)</option>
+                    <option value="4">★★★★☆ (4 Bintang)</option>
+                    <option value="3">★★★☆☆ (3 Bintang)</option>
+                    <option value="2">★★☆☆☆ (2 Bintang)</option>
+                    <option value="1">★☆☆☆☆ (1 Bintang)</option>
+                </select>
+                <br>
+                <label for="komentar">Komentar Anda:</label>
+                <textarea name="komentar" id="komentar" required></textarea>
+                <br>
+                <button type="submit" class="btn add-button" style="margin-top: 10px;">Kirim Review</button>
+            </form>
+        </div>
+
+        <div class="review-list">
+            <h3>Ulasan dari Pembaca Lain</h3>
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-user">{{ review.username }}</span>
+                            <span class="review-rating">★ {{ review.rating }}/5</span>
+                        </div>
+                        <p class="review-comment">{{ review.komentar }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Belum ada ulasan untuk buku ini. Jadilah yang pertama!</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="book-info">
+            <h2>Buku Tidak Ditemukan</h2>
+            <a href="{{ url_for('daftar_buku_user') }}">Kembali ke daftar buku</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

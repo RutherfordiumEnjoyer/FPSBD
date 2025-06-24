@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Perpustakaan Digital</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            /* --- PERUBAHAN 1: Mengganti background menjadi gradient biru --- */
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            display: flex;
+            width: 80%;
+            max-width: 1000px;
+            min-height: 600px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* Bayangan dibuat sedikit lebih gelap */
+            overflow: hidden;
+        }
+        .left-panel {
+            flex-basis: 50%;
+            /* --- PERUBAHAN 2: Menghapus warna biru muda agar panel menyatu dengan kotak putih --- */
+            /* background-color: #e6f2ff; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #f0f0f0; /* Memberi garis pemisah tipis */
+        }
+        .left-panel img {
+            max-width: 80%;
+            height: auto;
+        }
+        .right-panel {
+            flex-basis: 50%;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .right-panel h1 {
+            font-weight: 700;
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .right-panel p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        .form-options a {
+            color: #5b86e5;
+            text-decoration: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #36d1dc, #5b86e5);
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #555;
+        }
+        .btn-secondary:hover {
+            background: #e9e9e9;
+        }
+        .social-login {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .social-login p {
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            margin: 0 10px;
+            line-height: 40px;
+            color: #555;
+            font-size: 1.2em;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="left-panel">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/login-3305943-2757111.png" alt="Library Illustration">
+        </div>
+        <div class="right-panel">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="padding: 1em; margin-bottom: 1em; border-radius: 5px; background-color: #f8d7da; color: #721c24;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <h1>Selamat Datang :)</h1>
+            <p>Login dengan detail akun Anda untuk menikmati layanan perpustakaan kami.</p>
+            
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+                
+                <div class="form-options">
+                    <label><input type="checkbox" name="remember"> Remember Me</label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Login Now</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('register') }}'">Create Account</button>
+            </form>
+
+            <div class="social-login">
+                <p>Or you can join with</p>
+                <div class="social-icons">
+                    <a href="#" class="fab fa-google"></a>
+                    <a href="#" class="fab fa-facebook-f"></a>
+                    <a href="#" class="fab fa-twitter"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

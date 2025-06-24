@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profil Preferensi Saya{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2em; color: white; }
+    .page-header h1 { margin: 0; }
+    .profile-container { max-width: 700px; margin: auto; background-color: white; padding: 2em; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .profile-header { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 1em; margin-bottom: 1.5em; }
+    .profile-header h2 { margin: 0; }
+    .profile-stats { list-style: none; padding: 0; }
+    .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f1f1f1; }
+    .stat-item:last-child { border-bottom: none; }
+    .stat-label { font-weight: 600; color: #555; }
+    .stat-value { font-weight: 500; font-size: 1.1em; color: #007bff; }
+    .last-updated { text-align: center; margin-top: 2em; font-size: 0.8em; color: #888; }
+    .no-profile { text-align: center; }
+</style>
+
+<div class="page-header">
+    <h1>Profil Preferensi Membaca</h1>
+    <p>Analisis kebiasaan membaca Anda berdasarkan riwayat peminjaman.</p>
+</div>
+
+<div class="profile-container">
+    {% if profile %}
+        <div class="profile-header">
+            <h2>Statistik untuk {{ profile.username }}</h2>
+        </div>
+        <ul class="profile-stats">
+            <li class="stat-item">
+                <span class="stat-label">Total Buku Dipinjam</span>
+                <span class="stat-value">{{ profile.total_books_borrowed }} Buku</span>
+            </li>
+            <li class="stat-item">
+                <span class="stat-label">Kategori Favorit</span>
+                <span class="stat-value">{{ profile.favorite_category.name }} ({{ profile.favorite_category.count }} kali)</span>
+            </li>
+            <li class="stat-item">
+                <span class="stat-label">Penulis Favorit</span>
+                <span class="stat-value">{{ profile.favorite_author.name }} ({{ profile.favorite_author.count }} kali)</span>
+            </li>
+        </ul>
+        <div class="last-updated">
+            Terakhir diperbarui: {{ profile.last_updated }}
+        </div>
+    {% else %}
+        <div class="no-profile">
+            <h3>Profil Belum Tersedia</h3>
+            <p>Anda belum memiliki riwayat peminjaman. Pinjam beberapa buku untuk melihat profil preferensi Anda di sini.</p>
+            <a href="{{ url_for('daftar_buku_user') }}" class="btn add-button" style="margin-top: 1em;">Cari Buku Sekarang</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

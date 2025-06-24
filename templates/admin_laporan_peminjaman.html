@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+
+{% block title %}Laporan Peminjaman Lengkap{% endblock %}
+
+{% block content %}
+<style>
+    /* Menggunakan kembali gaya tabel modern */
+    table { width: 100%; border-collapse: separate; border-spacing: 0 1rem; margin-top: 1.5rem; }
+    th { background-color: transparent; color: rgba(255, 255, 255, 0.8); text-align: left; padding: 0.5rem 1.5rem; font-weight: 500; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+    td { background-color: #ffffff; padding: 1.25rem 1.5rem; vertical-align: middle; color: #333; font-weight: 500; }
+    .status-borrowed { color: #007bff; font-weight: bold; }
+    .status-returned { color: #28a745; font-weight: bold; }
+</style>
+
+<h1 style="color: white;">Laporan Peminjaman Lengkap</h1>
+<p style="color: rgba(255,255,255,0.9);">Menampilkan 50 aktivitas peminjaman terbaru.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Judul Buku</th>
+            <th>Peminjam</th>
+            <th>Tgl Pinjam</th>
+            <th>Jatuh Tempo</th>
+            <th>Status</th>
+            <th>Tgl Kembali</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in peminjaman %}
+        <tr>
+            <td>{{ p.title }}</td>
+            <td>{{ p.full_name }}</td>
+            <td>{{ p.borrow_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ p.due_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+                {% if p.status == 'returned' %}
+                    <span class="status-returned">Dikembalikan</span>
+                {% else %}
+                    <span class="status-borrowed">Dipinjam</span>
+                {% endif %}
+            </td>
+            <td>{{ p.return_date.strftime('%Y-%m-%d') if p.return_date else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Tidak ada data peminjaman.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

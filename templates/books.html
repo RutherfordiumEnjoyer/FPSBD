@@ -1,0 +1,118 @@
+{% extends 'layout.html' %}
+
+{% block title %}Daftar Buku{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { text-align: center; margin-bottom: 2em; color: white; }
+    .page-header h1 { margin: 0; }
+    .stock-empty { color: #888; font-style: italic; }
+
+    /* --- PERUBAHAN CSS DIMULAI DI SINI --- */
+
+    /* Menghilangkan border default dan menambahkan jarak antar baris */
+    table {
+        width: 100%;
+        border-collapse: separate; /* Ini penting agar border-spacing berfungsi */
+        border-spacing: 0 1rem; /* Memberi jarak vertikal 1rem antar baris */
+        margin-top: 1.5rem;
+    }
+
+    /* Styling untuk header tabel (Judul, Penulis, dll) */
+    th {
+        background-color: transparent; /* Header transparan agar menyatu dgn background */
+        color: rgba(255, 255, 255, 0.8);
+        text-align: left;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Styling utama untuk setiap sel data, membuatnya seperti kartu */
+    td {
+        background-color: #ffffff;
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: #333;
+        font-weight: 500;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    /* Memberi efek hover pada seluruh baris */
+    tr:hover td {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(4, 33, 52, 0.15);
+    }
+    
+    /* Memberi sudut melengkung pada sel pertama dan terakhir di setiap baris */
+    td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+    
+    td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    /* Perbaikan style untuk tombol agar lebih serasi */
+    .btn {
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+    }
+
+    /* --- PERUBAHAN CSS SELESAI DI SINI --- */
+</style>
+
+<div class="page-header">
+    <h1>Koleksi Buku Perpustakaan</h1>
+    <p>Pilih buku yang ingin Anda pinjam dari daftar di bawah ini.</p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Judul</th>
+            <th>Penulis</th>
+            <th>Kategori</th>
+            <th>Stok</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.category_name }}</td>
+            <td>{{ book.stock }}</td>
+            <td>
+                <div style="display: flex; gap: 10px;">
+                    {% if book.stock > 0 %}
+                        <form action="{{ url_for('proses_pinjam_buku', book_id=book.book_id) }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn" style="background-color: #007bff; color: white; font-size: 0.9em; padding: 8px 15px;">Pinjam</button>
+                        </form>
+                    {% else %}
+                        <span class="stock-empty">Stok Habis</span>
+                    {% endif %}
+                    
+                    <form action="{{ url_for('proses_tambah_wishlist', book_id=book.book_id) }}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn" style="background-color: #ffc107; color: black; font-size: 0.9em; padding: 8px 15px;">+ Wishlist</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Tidak ada buku di perpustakaan.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

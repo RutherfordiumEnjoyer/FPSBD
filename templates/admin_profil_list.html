@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block title %}Profil Preferensi Pengguna{% endblock %}
+{% block content %}
+<style>
+    /* Menggunakan gaya tabel modern */
+    table { width: 100%; border-collapse: separate; border-spacing: 0 1rem; margin-top: 1.5rem; }
+    th { background-color: transparent; color: rgba(255, 255, 255, 0.8); text-align: left; padding: 0.5rem 1.5rem; font-weight: 500; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+    td { background-color: #ffffff; padding: 1.25rem 1.5rem; vertical-align: middle; color: #333; font-weight: 500; }
+    td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+</style>
+
+<h1 style="color: white;">Profil Preferensi Pengguna</h1>
+<p style="color: rgba(255,255,255,0.9);">Ringkasan kebiasaan membaca dari semua pengguna yang aktif.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Total Pinjam</th>
+            <th>Kategori Favorit</th>
+            <th>Penulis Favorit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for profile in profiles %}
+        <tr>
+            <td><strong>{{ profile.username }}</strong><br><small>User ID: {{ profile.user_id }}</small></td>
+            <td>{{ profile.total_books_borrowed }} buku</td>
+            <td>{{ profile.favorite_category.name }} ({{ profile.favorite_category.count }} kali)</td>
+            <td>{{ profile.favorite_author.name }} ({{ profile.favorite_author.count }} kali)</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Tidak ada data profil preferensi yang bisa ditampilkan.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

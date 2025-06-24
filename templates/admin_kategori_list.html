@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+
+{% block title %}Manajemen Kategori{% endblock %}
+
+{% block content %}
+<style>
+    /* Menggunakan gaya tabel modern yang sama */
+    table { width: 100%; border-collapse: separate; border-spacing: 0 1rem; margin-top: 1.5rem; }
+    th { background-color: transparent; color: rgba(255, 255, 255, 0.8); text-align: left; padding: 0.5rem 1.5rem; font-weight: 500; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+    td { background-color: #ffffff; padding: 1.25rem 1.5rem; vertical-align: middle; color: #333; font-weight: 500; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+    tr:hover td { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(4, 33, 52, 0.15); }
+    td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+    .admin-actions { display: flex; gap: 10px; align-items: center; }
+    .btn { padding: 8px 15px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9em; border: none; cursor: pointer; }
+    .edit-button { background-color: #ffc107; color: black; }
+    .delete-button { background-color: #dc3545; color: white; }
+    .add-button { background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; transition: background-color 0.3s; }
+    .add-button:hover { background-color: #218838; }
+    .category-link {
+        text-decoration: none;
+        color: #0056b3;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+    .category-link:hover {
+        color: #007bff;
+        text-decoration: underline;
+    }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="color: white;">Manajemen Kategori</h1>
+    <a href="{{ url_for('admin_add_category') }}" class="add-button">+ Tambah Kategori Baru</a>
+</div>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nama Kategori</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cat in categories %}
+        <tr>
+            <td>{{ cat.category_id }}</td>
+            <td>
+                <a href="{{ url_for('admin_books_by_category', category_id=cat.category_id) }}" class="category-link">
+                    {{ cat.category_name }}
+                </a>
+            </td>
+            <td>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_edit_category', category_id=cat.category_id) }}" class="btn edit-button">Edit</a>
+                    <form action="{{ url_for('admin_delete_category', category_id=cat.category_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn delete-button" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?');">
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Belum ada kategori.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

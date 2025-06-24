@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Datang di Perpustakaan Digital</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* --- PERUBAHAN DI SINI --- */
+            background-color: #3498db; /* DIUBAH: Latar belakang menjadi biru */
+            color: white; /* DIUBAH: Warna teks utama menjadi putih */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            padding: 20px;
+        }
+        .illustration img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 2em;
+        }
+        .welcome-text h1 {
+            font-size: 3em;
+            margin: 0;
+            font-weight: 700;
+            color: white; /* DIUBAH: Warna judul menjadi putih */
+        }
+        .welcome-text p {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.9); /* DIUBAH: Warna deskripsi menjadi putih pudar */
+            max-width: 500px; 
+            margin: 15px auto 40px auto; 
+        }
+        .login-button {
+            background-color: white; /* DIUBAH: Latar tombol menjadi putih */
+            color: #3498db; /* DIUBAH: Warna teks tombol menjadi biru */
+            padding: 15px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1em;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .login-button:hover {
+            background-color: #f1f1f1; /* DIUBAH: Hover menjadi abu-abu terang */
+            transform: translateY(-3px);
+            color: #2980b9; /* DIUBAH: Teks hover menjadi biru tua */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="illustration">
+             <img src="{{ url_for('static', filename='images/logodepan.png') }}" alt="Library Logo">
+        </div>
+        <div class="welcome-text">
+            <h1>Perpustakaan Digital</h1>
+            <p>Jelajahi ribuan koleksi buku dan temukan petualangan baru dalam setiap halaman.</p>
+            <a href="{{ url_for('login') }}" class="login-button">LOGIN</a>
+        </div>
+    </div>
+</body>
+</html>

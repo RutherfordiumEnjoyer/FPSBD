@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %}Laporan Buku Terpopuler{% endblock %}
+
+{% block content %}
+<style>
+    /* Menggunakan kembali gaya dari buku_populer.html */
+    .trend-container { max-width: 800px; margin: auto; background-color: white; padding: 2em; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .update-section { margin-bottom: 2em; text-align: center; }
+    .trend-list { list-style-type: none; padding: 0; }
+    .trend-item { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; }
+    .trend-rank { font-size: 1.5em; font-weight: bold; color: #007bff; min-width: 40px; text-align: center; }
+    .trend-details { margin-left: 15px; }
+    .trend-title { font-weight: 600; font-size: 1.1em; }
+    .trend-count { font-size: 0.9em; color: #6c757d; }
+    .no-trends { text-align: center; color: #6c757d; }
+    .add-button { background-color: #17a2b8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; border: none; cursor: pointer; }
+</style>
+
+<div style="text-align: center; color: white; margin-bottom: 2em;">
+    <h1>Laporan Buku Terpopuler</h1>
+    <p>Buku yang paling banyak dipinjam dalam 7 hari terakhir.</p>
+</div>
+
+
+<div class="trend-container">
+    <div class="update-section">
+        <p style="font-size: 0.9em; color: #666;">Data tren diperbarui secara periodik. Klik untuk memperbarui sekarang.</p>
+        <form action="{{ url_for('admin_update_trends') }}" method="POST">
+            <button type="submit" class="add-button">Perbarui Data Tren</button>
+        </form>
+    </div>
+
+    {% if trends %}
+        <ol class="trend-list">
+            {% for trend in trends %}
+                <li class="trend-item">
+                    <div class="trend-rank">#{{ loop.index }}</div>
+                    <div class="trend-details">
+                        <div class="trend-title">{{ trend.title }}</div>
+                        <div class="trend-count">Dipinjam {{ trend.total_loans_last_7_days }} kali</div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="no-trends">Data tren belum tersedia. Coba klik tombol "Perbarui Data Tren".</p>
+    {% endif %}
+</div>
+{% endblock %}

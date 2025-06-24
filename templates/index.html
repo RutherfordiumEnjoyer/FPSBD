@@ -1,0 +1,109 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<style>
+    /* Gaya CSS modern disalin dari halaman pengguna untuk konsistensi */
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1rem;
+        margin-top: 1.5rem;
+    }
+    th {
+        background-color: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: left;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    td {
+        background-color: #ffffff;
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: #333;
+        font-weight: 500;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    tr:hover td {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(4, 33, 52, 0.15);
+    }
+    td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+    /* Penyesuaian untuk tombol-tombol admin */
+    .admin-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .btn.edit-button {
+        background-color: #ffc107; color: black; padding: 8px 15px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9em;
+    }
+    .btn.delete-button {
+        background-color: #dc3545; color: white; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.9em; border: none; cursor: pointer;
+    }
+    .add-button {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 25px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+    .add-button:hover {
+        background-color: #218838;
+    }
+</style>
+
+<h1>Daftar Buku di Perpustakaan</h1>
+    
+<a href="{{ url_for('halaman_tambah_buku') }}" class="add-button">
+    + Tambah Buku Baru
+</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Judul</th>
+            <th>Penulis</th>
+            <th>Stok</th>
+            <th>Kategori</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.book_id }}</td>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.stock }}</td>
+            <td>{{ book.category_name }}</td>
+            <td>
+                <div class="admin-actions">
+                    <a href="{{ url_for('halaman_edit_buku', book_id=book.book_id) }}" class="btn edit-button">Edit</a>
+                    <form action="{{ url_for('hapus_buku_proses', book_id=book.book_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn delete-button" onclick="return confirm('Apakah Anda yakin ingin menghapus buku ini?');">
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" style="text-align: center; background-color: rgba(255,255,255,0.9); border-radius: 12px;">
+                Tidak ada buku di perpustakaan.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block title %}Pusat Aktivitas Pengguna{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { color: white; margin-bottom: 2rem; }
+    .page-header h1 { margin: 0; font-weight: 600; }
+    .page-header p { opacity: 0.9; font-size: 1.1em; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .menu-card { background-color: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 25px; text-decoration: none; color: #333; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .menu-card h3 { margin-top: 0; font-size: 1.3em; color: #0056b3; }
+    .menu-card p { font-size: 0.9em; color: #666; flex-grow: 1; }
+    .menu-card .action-link { font-weight: 600; color: #007bff; text-decoration: none; margin-top: 1em; }
+    .menu-card .action-link:after { content: ' →'; }
+</style>
+
+<div class="page-header">
+    <h1>Pusat Aktivitas Pengguna</h1>
+    <p>Pantau berbagai aktivitas yang dilakukan oleh pengguna di platform.</p>
+</div>
+
+<div class="menu-grid">
+    <a href="{{ url_for('admin_activity_log') }}" class="menu-card">
+        <h3>Log Aktivitas Real-time</h3>
+        <p>Lihat jejak kronologis dari semua tindakan penting pengguna seperti meminjam, mengulas, atau menambah wishlist.</p>
+        <span class="action-link">Buka Log</span>
+    </a>
+
+    <a href="{{ url_for('admin_review_list') }}" class="menu-card">
+        <h3>Daftar Ulasan Pengguna</h3>
+        <p>Tinjau semua ulasan dan rating yang diberikan oleh pengguna untuk semua buku di perpustakaan.</p>
+        <span class="action-link">Lihat Ulasan</span>
+    </a>
+
+    <a href="{{ url_for('admin_user_profiles') }}" class="menu-card">
+        <h3>Profil Preferensi Pengguna</h3>
+        <p>Analisis tren membaca dan preferensi dari semua pengguna untuk memahami minat pembaca Anda.</p>
+        <span class="action-link">Lihat Profil</span>
+    </a>
+</div>
+
+{% endblock %}

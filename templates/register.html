@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Perpustakaan Digital</title>
+    <style>
+        /* Menggunakan style yang sama dengan login untuk konsistensi */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #f0f4f8; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .register-container { display: flex; width: 80%; max-width: 1000px; min-height: 600px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .left-panel { flex-basis: 50%; background-color: #e6f2ff; display: flex; justify-content: center; align-items: center; }
+        .left-panel img { max-width: 80%; height: auto; }
+        .right-panel { flex-basis: 50%; padding: 40px 60px; display: flex; flex-direction: column; justify-content: center; }
+        .right-panel h1 { font-weight: 700; font-size: 2.5em; color: #333; margin-bottom: 10px; }
+        .right-panel p { color: #888; margin-bottom: 30px; }
+        .form-group { position: relative; margin-bottom: 20px; }
+        .form-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .form-group input { width: 100%; padding: 15px 15px 15px 45px; border: 1px solid #ddd; border-radius: 10px; font-size: 1em; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s; }
+        .btn-primary { background: linear-gradient(45deg, #28a745, #218838); color: white; }
+        .login-link { text-align: center; margin-top: 20px; font-size: 0.9em; }
+        .login-link a { color: #5b86e5; text-decoration: none; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="left-panel">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/sign-up-3305942-2757110.png" alt="Register Illustration">
+        </div>
+        <div class="right-panel">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="padding: 1em; margin-bottom: 1em; border-radius: 5px; background-color: #f8d7da; color: #721c24;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <h1>Create Account</h1>
+            <p>Daftarkan diri Anda untuk mulai meminjam buku dan menikmati layanan kami.</p>
+            <form action="{{ url_for('register') }}" method="POST">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="full_name" placeholder="Nama Lengkap" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+            <div class="login-link">
+                <p>Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
