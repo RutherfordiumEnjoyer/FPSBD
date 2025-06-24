@@ -1,3 +1,5 @@
+# main_app.py (VERSI FINAL - LENGKAP & DIPERIKSA ULANG)
+
 from collections import Counter
 from database_connector import connect_to_mysql, connect_to_mongodb
 from datetime import date, timedelta, datetime
@@ -398,6 +400,48 @@ def get_book_trends():
     trends = list(db['book_trends'].find().sort("total_loans_last_7_days", -1))
     return trends
 
+def update_user_preference_profile(user_id, username):
+    conn = connect_to_mysql()
+    if conn is None: return "Koneksi database gagal."
+    try:
+        with conn.cursor() as cursor:
+            query = """
+                SELECT c.category_name, b.author
+                FROM borrowals br
+                JOIN books b ON br.book_id = b.book_id
+                JOIN categories c ON b.category_id = c.category_id
+                WHERE br.user_id = %s
+            """
+            cursor.execute(query, (user_id,))
+            history = cursor.fetchall()
+        
+        if not history:
+            return True
+
+        total_borrowed = len(history)
+        category_counts = Counter(item['category_name'] for item in history)
+        author_counts = Counter(item['author'] for item in history)
+        favorite_category = category_counts.most_common(1)[0] if category_counts else ("-", 0)
+        favorite_author = author_counts.most_common(1)[0] if author_counts else ("-", 0)
+        
+        db_mongo = connect_to_mongodb()
+        if db_mongo is None: return "Koneksi MongoDB gagal."
+
+        profile_document = {
+            "user_id": user_id, "username": username,
+            "total_books_borrowed": total_borrowed,
+            "favorite_category": {"name": favorite_category[0], "count": favorite_category[1]},
+            "favorite_author": {"name": favorite_author[0], "count": favorite_author[1]},
+            "last_updated": datetime.now().isoformat()
+        }
+        db_mongo['user_preferences'].update_one({'user_id': user_id}, {'$set': profile_document}, upsert=True)
+        return True
+    except Exception as e:
+        return f"Gagal membuat profil preferensi: {e}"
+    finally:
+        if conn:
+            conn.close()
+
 def get_user_preference(user_id):
     db = connect_to_mongodb()
     if db is None: return None
@@ -531,6 +575,50 @@ def hapus_kategori(category_id):
         return True
     except Exception as e:
         return f"Gagal menghapus kategori: {e}"
+    finally:
+        if conn:
+            conn.close()
+
+def lihat_semua_peminjaman(limit=50):
+    conn = connect_to_mysql()
+    if conn is None: return []
+    try:
+        with conn.cursor() as cursor:
+            query = """
+                SELECT br.borrowal_id, b.title, u.full_name, br.borrow_date, br.due_date, br.status, br.return_date
+                FROM borrowals br
+                JOIN books b ON br.book_id = b.book_id
+                JOIN users u ON br.user_id = u.user_id
+                ORDER BY br.borrow_date DESC
+                LIMIT %s
+            """
+            cursor.execute(query, (limit,))
+            borrowals = cursor.fetchall()
+        return borrowals
+    except Exception as e:
+        print(f"[ERROR-lihat_semua_peminjaman]: {e}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+            
+def get_books_by_category(category_id):
+    conn = connect_to_mysql()
+    if conn is None: return []
+    try:
+        with conn.cursor() as cursor:
+            query = """
+                SELECT b.*, c.category_name 
+                FROM books b 
+                JOIN categories c ON b.category_id = c.category_id 
+                WHERE b.category_id = %s
+            """
+            cursor.execute(query, (category_id,))
+            books = cursor.fetchall()
+        return books
+    except Exception as e:
+        print(f"[ERROR-get_books_by_category]: {e}")
+        return []
     finally:
         if conn:
             conn.close()
