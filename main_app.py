@@ -34,10 +34,52 @@ def get_all_book_titles_dict():
         if conn:
             conn.close()
 
+def user_login(email, password):
+    conn = connect_to_mysql()
+    if conn is None: return None
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT user_id, full_name, password_hash FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
+        if user and check_password_hash(user['password_hash'], password):
+            return user
+        else:
+            return None
+    except Exception as e:
+        print(f"[ERROR-user_login]: {e}")
+        return None
+    finally:
+        if conn:
+            conn.close()
+
+def register_user(full_name, email, password):
+    conn = None
+    try:
+        conn = connect_to_mysql()
+        if conn is None:
+            return "Koneksi database gagal. Harap periksa kembali Environment Variables dan status database cloud Anda."
+        with conn.cursor() as cursor:
+            hashed_password = generate_password_hash(password)
+            query = "INSERT INTO users (full_name, email, password_hash) VALUES (%s, %s, %s)"
+            values = (full_name, email, hashed_password)
+            cursor.execute(query, values)
+        conn.commit()
+        return True
+    except pymysql.MySQLError as e:
+        if "1062" in str(e):
+            return "Email ini sudah terdaftar. Silakan gunakan email lain."
+        print(f"Database Error: {e}")
+        return "Terjadi kesalahan pada server database."
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return "Terjadi kesalahan tak terduga."
+    finally:
+        if conn:
+            conn.close()
+
 def tambah_buku(title, author, publication_year, stock, category_id):
     conn = connect_to_mysql()
-    if conn is None:
-        return "Koneksi database gagal."
+    if conn is None: return "Koneksi database gagal."
     try:
         with conn.cursor() as cursor:
             query = "INSERT INTO books (title, author, publication_year, stock, category_id) VALUES (%s, %s, %s, %s, %s)"
@@ -48,16 +90,13 @@ def tambah_buku(title, author, publication_year, stock, category_id):
     except Exception as e:
         if "1452" in str(e):
             return "Gagal menambahkan buku: ID Kategori tidak ditemukan."
-        else:
-            return f"Gagal menambahkan buku: {e}"
+        return f"Gagal menambahkan buku: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def lihat_semua_buku():
     conn = connect_to_mysql()
-    if conn is None: 
-        return []
+    if conn is None: return []
     try:
         with conn.cursor() as cursor:
             query = "SELECT b.*, c.category_name FROM books b LEFT JOIN categories c ON b.category_id = c.category_id ORDER BY b.book_id"
@@ -68,36 +107,28 @@ def lihat_semua_buku():
         print(f"[ERROR-lihat_semua_buku]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def hapus_buku(book_id):
     conn = connect_to_mysql()
-    if conn is None:
-        return "Koneksi database gagal."
+    if conn is None: return "Koneksi database gagal."
     try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM borrowals WHERE book_id = %s AND status = 'borrowed'", (book_id,))
             if cursor.fetchone()['COUNT(*)'] > 0:
                 return "Buku tidak dapat dihapus karena masih ada yang meminjam."
-
             cursor.execute("DELETE FROM books WHERE book_id = %s", (book_id,))
             rowcount = cursor.rowcount
         conn.commit()
-        if rowcount > 0:
-            return True
-        else:
-            return "Buku dengan ID tersebut tidak ditemukan."
+        return rowcount > 0
     except Exception as e:
         return f"Gagal menghapus buku: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def get_book_by_id(book_id):
     conn = connect_to_mysql()
-    if conn is None:
-        return None
+    if conn is None: return None
     try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM books WHERE book_id = %s", (book_id,))
@@ -107,20 +138,14 @@ def get_book_by_id(book_id):
         print(f"[ERROR-get_book_by_id]: {e}")
         return None
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def update_buku(book_id, title, author, publication_year, stock, category_id):
     conn = connect_to_mysql()
-    if conn is None:
-        return "Koneksi database gagal."
+    if conn is None: return "Koneksi database gagal."
     try:
         with conn.cursor() as cursor:
-            query = """
-                UPDATE books 
-                SET title = %s, author = %s, publication_year = %s, stock = %s, category_id = %s 
-                WHERE book_id = %s
-            """
+            query = "UPDATE books SET title = %s, author = %s, publication_year = %s, stock = %s, category_id = %s WHERE book_id = %s"
             values = (title, author, publication_year, stock, category_id, book_id)
             cursor.execute(query, values)
         conn.commit()
@@ -129,13 +154,11 @@ def update_buku(book_id, title, author, publication_year, stock, category_id):
         conn.rollback()
         return f"Gagal memperbarui buku: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def lihat_semua_kategori():
     conn = connect_to_mysql()
-    if conn is None:
-        return []
+    if conn is None: return []
     try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM categories ORDER BY category_id")
@@ -145,8 +168,7 @@ def lihat_semua_kategori():
         print(f"[ERROR-lihat_semua_kategori]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def pinjam_buku(user_id, username, book_id):
     conn = connect_to_mysql()
@@ -157,7 +179,6 @@ def pinjam_buku(user_id, username, book_id):
             result = cursor.fetchone()
             if result is None or result['stock'] <= 0:
                 return "Gagal meminjam: Buku tidak ditemukan atau stok habis."
-            
             cursor.execute("UPDATE books SET stock = stock - 1 WHERE book_id = %s", (book_id,))
             tgl_pinjam = date.today()
             tgl_kembali = tgl_pinjam + timedelta(days=7)
@@ -171,21 +192,14 @@ def pinjam_buku(user_id, username, book_id):
         conn.rollback()
         return f"Terjadi kesalahan saat proses peminjaman: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def lihat_pinjaman_user(user_id):
     conn = connect_to_mysql()
     if conn is None: return []
     try:
         with conn.cursor() as cursor:
-            query = """
-                SELECT br.borrowal_id, b.title, br.borrow_date, br.due_date, br.status, br.return_date
-                FROM borrowals br
-                JOIN books b ON br.book_id = b.book_id
-                WHERE br.user_id = %s
-                ORDER BY br.borrow_date DESC
-            """
+            query = "SELECT br.borrowal_id, b.title, br.borrow_date, br.due_date, br.status, br.return_date FROM borrowals br JOIN books b ON br.book_id = b.book_id WHERE br.user_id = %s ORDER BY br.borrow_date DESC"
             cursor.execute(query, (user_id,))
             pinjaman = cursor.fetchall()
         for p in pinjaman:
@@ -200,8 +214,7 @@ def lihat_pinjaman_user(user_id):
         print(f"[ERROR-lihat_pinjaman_user]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def kembalikan_buku(user_id, username, borrowal_id):
     conn = connect_to_mysql()
@@ -210,11 +223,8 @@ def kembalikan_buku(user_id, username, borrowal_id):
         with conn.cursor() as cursor:
             cursor.execute("SELECT book_id, status FROM borrowals WHERE borrowal_id = %s", (borrowal_id,))
             result = cursor.fetchone()
-            if not result:
-                return "ID Peminjaman tidak ditemukan."
-            if result['status'] == 'returned':
-                return "Buku ini sudah pernah dikembalikan."
-            
+            if not result: return "ID Peminjaman tidak ditemukan."
+            if result['status'] == 'returned': return "Buku ini sudah pernah dikembalikan."
             book_id = result['book_id']
             cursor.execute("UPDATE borrowals SET status = 'returned', return_date = %s WHERE borrowal_id = %s", (date.today(), borrowal_id))
             cursor.execute("UPDATE books SET stock = stock + 1 WHERE book_id = %s", (book_id,))
@@ -225,8 +235,7 @@ def kembalikan_buku(user_id, username, borrowal_id):
         conn.rollback()
         return f"Terjadi kesalahan saat proses pengembalian: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def tambah_ke_wishlist(user_id, username, book_id):
     conn = connect_to_mysql()
@@ -239,15 +248,11 @@ def tambah_ke_wishlist(user_id, username, book_id):
         log_activity(user_id, username, "ADD_WISHLIST", {"book_id": book_id})
         return True
     except Exception as e:
-        if "1062" in str(e):
-            return "Buku ini sudah ada di dalam wishlist Anda."
-        elif "1452" in str(e):
-            return "Gagal menambahkan ke wishlist: User ID atau Book ID tidak ditemukan."
-        else:
-            return f"Gagal menambahkan ke wishlist: {e}"
+        if "1062" in str(e): return "Buku ini sudah ada di dalam wishlist Anda."
+        elif "1452" in str(e): return "Gagal menambahkan ke wishlist: User ID atau Book ID tidak ditemukan."
+        else: return f"Gagal menambahkan ke wishlist: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def lihat_wishlist_user(user_id):
     conn = connect_to_mysql()
@@ -262,8 +267,7 @@ def lihat_wishlist_user(user_id):
         print(f"[ERROR-lihat_wishlist_user]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def hapus_dari_wishlist(user_id, username, wishlist_id):
     conn = connect_to_mysql()
@@ -281,33 +285,15 @@ def hapus_dari_wishlist(user_id, username, wishlist_id):
     except Exception as e:
         return f"Gagal menghapus dari wishlist: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def tambah_review(book_id, user_id, username, rating, komentar):
-    db = connect_to_mongodb()
-    if db is None: return "Koneksi ke MongoDB gagal."
-    
-    conn = connect_to_mysql()
-    book_title = "Judul Tidak Ditemukan"
-    if conn:
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute("SELECT title FROM books WHERE book_id = %s", (book_id,))
-                result = cursor.fetchone()
-                if result:
-                    book_title = result['title']
-        finally:
-            if conn:
-                conn.close()
-    
-    review_document = {
-        "book_id": book_id, "user_id": user_id, "username": username,
-        "book_title": book_title, "rating": rating, "komentar": komentar,
-        "tanggal_review": date.today().isoformat()
-    }
+    db_mongo = connect_to_mongodb()
+    if db_mongo is None: return "Koneksi ke MongoDB gagal."
+    book_title = get_book_by_id(book_id)['title'] if get_book_by_id(book_id) else "Judul Tidak Ditemukan"
+    review_document = { "book_id": book_id, "user_id": user_id, "username": username, "book_title": book_title, "rating": rating, "komentar": komentar, "tanggal_review": date.today().isoformat() }
     try:
-        db['reviews'].insert_one(review_document)
+        db_mongo['reviews'].insert_one(review_document)
         log_activity(user_id, username, "ADD_REVIEW", {"book_id": book_id, "rating": rating})
         return True
     except Exception as e:
@@ -323,10 +309,7 @@ def log_activity(user_id, username, activity_type, details={}):
     db = connect_to_mongodb()
     if db is None: return
     try:
-        log_document = {
-            "user_id": user_id, "username": username, "activity_type": activity_type,
-            "details": details, "timestamp": datetime.now().isoformat()
-        }
+        log_document = { "user_id": user_id, "username": username, "activity_type": activity_type, "details": details, "timestamp": datetime.now().isoformat() }
         db['activity_logs'].insert_one(log_document)
     except Exception as e:
         print(f"\n[SYSTEM-LOG-ERROR] Gagal mencatat aktivitas: {e}")
@@ -352,8 +335,7 @@ def _get_book_details(book_ids):
         print(f"[ERROR-_get_book_details]: {e}")
         return {}
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def update_book_trends():
     db_mongo = connect_to_mongodb()
@@ -365,23 +347,13 @@ def update_book_trends():
             query = "SELECT book_id, COUNT(book_id) as jumlah_pinjam FROM borrowals WHERE borrow_date >= %s GROUP BY book_id ORDER BY jumlah_pinjam DESC LIMIT 5"
             cursor.execute(query, (start_date,))
             top_books_raw = cursor.fetchall()
-        
-        if not top_books_raw:
-            return "Tidak ada data peminjaman dalam 7 hari terakhir."
-        
+        if not top_books_raw: return "Tidak ada data peminjaman dalam 7 hari terakhir."
         book_ids = [item['book_id'] for item in top_books_raw]
         book_details = _get_book_details(book_ids)
-        
         trends_data = []
         for item in top_books_raw:
             book_id = item['book_id']
-            trends_data.append({
-                "book_id": book_id,
-                "title": book_details.get(book_id, "Judul Tidak Ditemukan"),
-                "total_loans_last_7_days": item['jumlah_pinjam'],
-                "last_updated": date.today().isoformat()
-            })
-            
+            trends_data.append({"book_id": book_id, "title": book_details.get(book_id, "Judul Tidak Ditemukan"), "total_loans_last_7_days": item['jumlah_pinjam'], "last_updated": date.today().isoformat()})
         if trends_data:
             db_mongo['book_trends'].delete_many({})
             db_mongo['book_trends'].insert_many(trends_data)
@@ -389,56 +361,36 @@ def update_book_trends():
     except Exception as e:
         return f"Gagal memperbarui tren buku: {e}"
     finally:
-        if conn_sql:
-            conn_sql.close()
+        if conn_sql: conn_sql.close()
 
 def get_book_trends():
     db = connect_to_mongodb()
     if db is None: return []
-    trends = list(db['book_trends'].find().sort("total_loans_last_7_days", -1))
-    return trends
+    return list(db['book_trends'].find().sort("total_loans_last_7_days", -1))
 
 def update_user_preference_profile(user_id, username):
     conn = connect_to_mysql()
     if conn is None: return "Koneksi database gagal."
     try:
         with conn.cursor() as cursor:
-            query = """
-                SELECT c.category_name, b.author
-                FROM borrowals br
-                JOIN books b ON br.book_id = b.book_id
-                JOIN categories c ON b.category_id = c.category_id
-                WHERE br.user_id = %s
-            """
+            query = "SELECT c.category_name, b.author FROM borrowals br JOIN books b ON br.book_id = b.book_id JOIN categories c ON b.category_id = c.category_id WHERE br.user_id = %s"
             cursor.execute(query, (user_id,))
             history = cursor.fetchall()
-        
-        if not history:
-            return True
-
+        if not history: return True
         total_borrowed = len(history)
         category_counts = Counter(item['category_name'] for item in history)
         author_counts = Counter(item['author'] for item in history)
         favorite_category = category_counts.most_common(1)[0] if category_counts else ("-", 0)
         favorite_author = author_counts.most_common(1)[0] if author_counts else ("-", 0)
-        
         db_mongo = connect_to_mongodb()
         if db_mongo is None: return "Koneksi MongoDB gagal."
-
-        profile_document = {
-            "user_id": user_id, "username": username,
-            "total_books_borrowed": total_borrowed,
-            "favorite_category": {"name": favorite_category[0], "count": favorite_category[1]},
-            "favorite_author": {"name": favorite_author[0], "count": favorite_author[1]},
-            "last_updated": datetime.now().isoformat()
-        }
+        profile_document = {"user_id": user_id, "username": username, "total_books_borrowed": total_borrowed, "favorite_category": {"name": favorite_category[0], "count": favorite_category[1]}, "favorite_author": {"name": favorite_author[0], "count": favorite_author[1]}, "last_updated": datetime.now().isoformat()}
         db_mongo['user_preferences'].update_one({'user_id': user_id}, {'$set': profile_document}, upsert=True)
         return True
     except Exception as e:
         return f"Gagal membuat profil preferensi: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def get_user_preference(user_id):
     db = connect_to_mongodb()
@@ -458,8 +410,7 @@ def dapatkan_kategori_wishlist(user_id):
         print(f"[ERROR-dapatkan_kategori_wishlist]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def dapatkan_buku_per_kategori_limit(category_id, limit=3):
     conn = connect_to_mysql()
@@ -474,8 +425,7 @@ def dapatkan_buku_per_kategori_limit(category_id, limit=3):
         print(f"[ERROR-dapatkan_buku_per_kategori_limit]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def dapatkan_rekomendasi_buku(user_id):
     kategori_favorit = dapatkan_kategori_wishlist(user_id)
@@ -511,8 +461,7 @@ def get_dashboard_stats():
         print(f"Error getting dashboard stats: {e}")
         return stats
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def tambah_kategori(category_name):
     conn = connect_to_mysql()
@@ -523,12 +472,10 @@ def tambah_kategori(category_name):
         conn.commit()
         return True
     except Exception as e:
-        if "1062" in str(e):
-            return "Nama kategori sudah ada."
+        if "1062" in str(e): return "Nama kategori sudah ada."
         return f"Gagal menambahkan kategori: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def get_category_by_id(category_id):
     conn = connect_to_mysql()
@@ -542,8 +489,7 @@ def get_category_by_id(category_id):
         print(f"[ERROR-get_category_by_id]: {e}")
         return None
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def update_kategori(category_id, category_name):
     conn = connect_to_mysql()
@@ -556,8 +502,7 @@ def update_kategori(category_id, category_name):
     except Exception as e:
         return f"Gagal memperbarui kategori: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def hapus_kategori(category_id):
     conn = connect_to_mysql()
@@ -569,27 +514,20 @@ def hapus_kategori(category_id):
             if book_count > 0:
                 return f"Gagal menghapus: Masih ada {book_count} buku dalam kategori ini."
             cursor.execute("DELETE FROM categories WHERE category_id = %s", (category_id,))
+            rowcount = cursor.rowcount
         conn.commit()
-        return True
+        return rowcount > 0
     except Exception as e:
         return f"Gagal menghapus kategori: {e}"
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
 
 def lihat_semua_peminjaman(limit=50):
     conn = connect_to_mysql()
     if conn is None: return []
     try:
         with conn.cursor() as cursor:
-            query = """
-                SELECT br.borrowal_id, b.title, u.full_name, br.borrow_date, br.due_date, br.status, br.return_date
-                FROM borrowals br
-                JOIN books b ON br.book_id = b.book_id
-                JOIN users u ON br.user_id = u.user_id
-                ORDER BY br.borrow_date DESC
-                LIMIT %s
-            """
+            query = "SELECT br.borrowal_id, b.title, u.full_name, br.borrow_date, br.due_date, br.status, br.return_date FROM borrowals br JOIN books b ON br.book_id = b.book_id JOIN users u ON br.user_id = u.user_id ORDER BY br.borrow_date DESC LIMIT %s"
             cursor.execute(query, (limit,))
             borrowals = cursor.fetchall()
         return borrowals
@@ -597,20 +535,14 @@ def lihat_semua_peminjaman(limit=50):
         print(f"[ERROR-lihat_semua_peminjaman]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
             
 def get_books_by_category(category_id):
     conn = connect_to_mysql()
     if conn is None: return []
     try:
         with conn.cursor() as cursor:
-            query = """
-                SELECT b.*, c.category_name 
-                FROM books b 
-                JOIN categories c ON b.category_id = c.category_id 
-                WHERE b.category_id = %s
-            """
+            query = "SELECT b.*, c.category_name FROM books b JOIN categories c ON b.category_id = c.category_id WHERE b.category_id = %s"
             cursor.execute(query, (category_id,))
             books = cursor.fetchall()
         return books
@@ -618,24 +550,4 @@ def get_books_by_category(category_id):
         print(f"[ERROR-get_books_by_category]: {e}")
         return []
     finally:
-        if conn:
-            conn.close()
-
-def user_login(email, password):
-    conn = connect_to_mysql()
-    if conn is None:
-        return None
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT user_id, full_name, password_hash FROM users WHERE email = %s", (email,))
-            user = cursor.fetchone()
-        if user and check_password_hash(user['password_hash'], password):
-            return user
-        else:
-            return None
-    except Exception as e:
-        print(f"[ERROR-user_login]: {e}")
-        return None
-    finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
