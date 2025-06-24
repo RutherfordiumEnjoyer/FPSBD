@@ -1,5 +1,3 @@
-# main_app.py (VERSI FINAL - LENGKAP & DIPERIKSA ULANG)
-
 from collections import Counter
 from database_connector import connect_to_mysql, connect_to_mongodb
 from datetime import date, timedelta, datetime
@@ -619,6 +617,25 @@ def get_books_by_category(category_id):
     except Exception as e:
         print(f"[ERROR-get_books_by_category]: {e}")
         return []
+    finally:
+        if conn:
+            conn.close()
+
+def user_login(email, password):
+    conn = connect_to_mysql()
+    if conn is None:
+        return None
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT user_id, full_name, password_hash FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
+        if user and check_password_hash(user['password_hash'], password):
+            return user
+        else:
+            return None
+    except Exception as e:
+        print(f"[ERROR-user_login]: {e}")
+        return None
     finally:
         if conn:
             conn.close()
