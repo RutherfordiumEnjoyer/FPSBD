@@ -588,42 +588,34 @@ def user_login(email, password):
             conn.close()
 
 def register_user(full_name, email, password):
-    conn = None  # Definisikan di luar try agar bisa diakses di finally
+    conn = None
     try:
         conn = connect_to_mysql()
-        # Jika koneksi gagal, conn akan menjadi None. Kita harus cek di sini.
         if conn is None:
-            # Mengembalikan pesan error yang jelas jika koneksi gagal dari awal
-            return "Koneksi database gagal. Periksa kembali Environment Variables atau status database cloud."
+            # Pesan error yang akan ditampilkan jika koneksi gagal
+            return "Koneksi database gagal. Harap periksa kembali Environment Variables dan status database cloud Anda."
 
-        cursor = conn.cursor()
-        
-        hashed_password = generate_password_hash(password)
-        
-        query = "INSERT INTO users (full_name, email, password_hash) VALUES (%s, %s, %s)"
-        values = (full_name, email, hashed_password)
-        
-        cursor.execute(query, values)
+        with conn.cursor() as cursor:
+            hashed_password = generate_password_hash(password)
+            query = "INSERT INTO users (full_name, email, password_hash) VALUES (%s, %s, %s)"
+            values = (full_name, email, hashed_password)
+            cursor.execute(query, values)
         conn.commit()
         return True
     
     except pymysql.MySQLError as e:
-        # Menangkap error spesifik dari database (misal: duplicate email)
-        error_message = f"Database Error: {e}"
-        print(error_message) # Cetak ke log Vercel
-        
-        # Memberi pesan yang lebih ramah ke pengguna
-        if "1062" in str(e):
+        # Memberi pesan yang lebih ramah jika terjadi error dari database
+        if "1062" in str(e): # Error untuk duplicate entry
              return "Email ini sudah terdaftar. Silakan gunakan email lain."
-        return "Terjadi kesalahan pada database."
+        print(f"Database Error: {e}") # Untuk log di Vercel
+        return "Terjadi kesalahan pada server database."
 
     except Exception as e:
-        # Menangkap error tak terduga lainnya
-        return f"An unexpected error occurred: {e}"
+        print(f"An unexpected error occurred: {e}") # Untuk log di Vercel
+        return "Terjadi kesalahan tak terduga."
         
     finally:
-        # Memastikan koneksi selalu ditutup
-        if conn and conn.is_connected():
+        if conn:
             conn.close()
 
 def lihat_semua_review(limit=20):
