@@ -569,22 +569,27 @@ def user_login(email, password):
     conn = connect_to_mysql()
     if conn is None:
         return None
+    
     try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT user_id, full_name, password_hash FROM users WHERE email = %s", (email,))
-        user = cursor.fetchone()
+        # Menggunakan 'with' statement adalah cara terbaik dan paling aman.
+        # Ini memastikan cursor akan selalu ditutup secara otomatis.
+        with conn.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT user_id, full_name, password_hash FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
         
-        # Cek jika user ada DAN hash passwordnya cocok
+        # Pengecekan password dilakukan setelah block 'with' selesai
         if user and check_password_hash(user['password_hash'], password):
             return user
         else:
             return None
+            
     except Exception as e:
         print(f"[ERROR-user_login]: {e}")
         return None
+        
     finally:
+        # Kita hanya perlu menutup koneksi, karena cursor sudah ditangani oleh 'with'
         if conn.is_connected():
-            cursor.close()
             conn.close()
 
 def register_user(full_name, email, password):
