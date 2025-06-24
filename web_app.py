@@ -159,7 +159,6 @@ def admin_delete_category(category_id):
 @app.route('/admin/categories/<int:category_id>/books')
 @admin_required
 def admin_books_by_category(category_id):
-    """Menampilkan semua buku dalam satu kategori."""
     category = get_category_by_id(category_id)
     if not category:
         flash("Kategori tidak ditemukan.", "danger")
